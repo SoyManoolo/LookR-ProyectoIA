@@ -5,9 +5,24 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel
 from llama_cpp import Llama
+from typing import Literal
 
 load_dotenv()
 url = os.getenv('OLLAMA_URL')
+
+Categoria = Literal[
+    'vestido',
+    'chaqueta',
+    'pantalón',
+    'camisa',
+    'camiseta',
+    'falda',
+    'abrigo',
+    'traje',
+    'zapatos',
+    'accesorio',
+    'otro'
+]
 
 class DescripcionRopa(BaseModel):
     Descripcion: str
@@ -16,14 +31,14 @@ class DescripcionRopa(BaseModel):
 
 
 model = OllamaModel(
-    'gemma4:31b',
+    'gemma4:e4b',
     provider=OllamaProvider(base_url=url),
 )
 
-model = Llama.from_pretrained(
-	repo_id="jc-builds/Qwen3.5-9B-VLM-Q4_K_M-GGUF",
-	filename="Qwen3.5-9B-Q4_K_M.gguf",
-)
+#model = Llama.from_pretrained(
+#	repo_id="jc-builds/Qwen3.5-9B-VLM-Q4_K_M-GGUF",
+#	filename="Qwen3.5-9B-Q4_K_M.gguf",
+#)
 
 #model.create_chat_completion(
 #	messages = [
