@@ -1,22 +1,62 @@
-from pydantic_ai import Agent
+from pydantic_ai import Agent, BinaryContent
 from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.providers.ollama import OllamaProvider
 import os
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from llama_cpp import Llama
 
 load_dotenv()
-
 url = os.getenv('OLLAMA_URL')
 
+class DescripcionRopa(BaseModel):
+    Descripcion: str
+    Categoria: list[Categoria]
+    estilo: str
+
+
 model = OllamaModel(
-    'gemma4:31b', provider=OllamaProvider(base_url=url)
-    # system_prompt=(
-    #     'Actúa como un experto en moda para describir ropa, como si estuvieras hablando directamente con el cliente'
-    # )
+    'gemma4:31b',
+    provider=OllamaProvider(base_url=url),
 )
 
-agent = Agent(model)
+model = Llama.from_pretrained(
+	repo_id="jc-builds/Qwen3.5-9B-VLM-Q4_K_M-GGUF",
+	filename="Qwen3.5-9B-Q4_K_M.gguf",
+)
 
-result_sync = agent.run_sync('Desarrolla la formula de MRUA')
+#model.create_chat_completion(
+#	messages = [
+#		{
+#			"role": "user",
+#			"content": [
+#				{
+#					"type": "text",
+#					"text": "Describe this image in one sentence."
+#				},
+#				{
+#					"type": "image_url",
+#					"image_url": {
+#						"url": "https://cdn.britannica.com/61/93061-050-99147DCE/Statue-of-Liberty-Island-New-York-Bay.jpg"
+#					}
+#				}
+#			]
+#		}
+#	]
+#)
 
-print(result_sync.output)
+
+with open('pngtree-ball-gown-dress-isolated-on-white-transparent-background-png-image_17416216.png', 'rb') as f:
+    image_bytes = f.read()
+
+agent = Agent(
+    model,
+    output_type=DescripcionRopa,
+    system_prompt='Eres un experto en moda. Analiza prendas de ropa en imágenes y devuelve descripciones estructuradas y atractivas para el cliente.'
+)
+
+result = agent.run_sync([
+    BinaryContent(data=image_bytes, media_type='image/png'),
+])
+
+print(result.output)
