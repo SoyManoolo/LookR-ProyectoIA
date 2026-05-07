@@ -61,7 +61,7 @@ model = OllamaModel(
 #)
 
 
-with open('pngtree-ball-gown-dress-isolated-on-white-transparent-background-png-image_17416216.png', 'rb') as f:
+with open('unnamed.png', 'rb') as f:
     image_bytes = f.read()
 
 agent = Agent(
