@@ -1,0 +1,344 @@
+[
+  {
+    "name": "Peach Pleat Fashions",
+    "category": "Women's Clothing",
+    "vibe": "Elegant & Chic",
+    "id": "peach-pleat-fashions",
+    "image_path": "peach-pleat-fashions.jpg",
+    "description": "jacket, peach, fabric, pleated",
+    "popularity": 100
+  },
+  {
+    "name": "Golden Threads Print Shirt",
+    "category": "Womens clothing",
+    "vibe": "Elegant and Trendy",
+    "id": "golden-threads-print-shirt",
+    "image_path": "golden-threads-print-shirt.jpg",
+    "description": "shirt, yellow, cotton, print",
+    "popularity": 100
+  },
+  {
+    "name": "Red Essence Skirt",
+    "category": "Women's Clothing",
+    "vibe": "Elegant and Classic",
+    "id": "red-essence-skirt",
+    "image_path": "red-essence-skirt.jpg",
+    "description": "skirt, red, fabric, none",
+    "popularity": 100
+  },
+  {
+    "name": "Floral Fabric Caps",
+    "category": "Bags and Luggage",
+    "vibe": "Elegant and Stylish",
+    "id": "floral-fabric-caps",
+    "image_path": "floral-fabric-caps.jpg",
+    "description": "cap, dark, fabric, floral",
+    "popularity": 100
+  },
+  {
+    "name": "Colorful Strappy Synthetic Ensemble",
+    "category": "Shoes",
+    "vibe": "Fashionable and Fun",
+    "id": "colorful-strappy-synthetic-ensemble",
+    "image_path": "colorful-strappy-synthetic-ensemble.jpg",
+    "description": "boot, purple, pink, synthetic, strap",
+    "popularity": 100
+  },
+  {
+    "name": "ColorWeave Geometrics",
+    "category": "Women's Clothing",
+    "vibe": "Bold and Stylish",
+    "id": "colorweave-geometrics",
+    "image_path": "colorweave-geometrics.jpg",
+    "description": "skirt, multicolor, fabric, geometric",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Blaspheme",
+    "category": "Womens clothing",
+    "vibe": "Feminine, Luxurious",
+    "id": "elegante-blaspheme",
+    "image_path": "elegante-blaspheme.jpg",
+    "description": "blouse, cream, lace, floral",
+    "popularity": 100
+  },
+  {
+    "name": "Crisp White Cotton Tee",
+    "category": "Mens clothing",
+    "vibe": "Casual, classic",
+    "id": "crisp-white-cotton-tee",
+    "image_path": "crisp-white-cotton-tee.jpg",
+    "description": "T-shirt, white, cotton, none",
+    "popularity": 100
+  },
+  {
+    "name": "Pretty Pink Gingham",
+    "category": "Womens clothing",
+    "vibe": "Chic & Feminine",
+    "id": "pretty-pink-gingham",
+    "image_path": "pretty-pink-gingham.jpg",
+    "description": "dress, pink, cotton, gingham",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant Pleat-Style Skirt",
+    "category": "Women's Clothing",
+    "vibe": "Classic & Professional",
+    "id": "elegant-pleat-style-skirt",
+    "image_path": "elegant-pleat-style-skirt.jpg",
+    "description": "skirt, black, fabric, pleated",
+    "popularity": 100
+  },
+  {
+    "name": "Soccer Flames Xtreme Tee",
+    "category": "Mens clothing",
+    "vibe": "Sporty & Assertive",
+    "id": "soccer-flames-xtreme-tee",
+    "image_path": "soccer-flames-xtreme-tee.jpg",
+    "description": "shirt, black, red, cotton, soccer, ball, text, flames",
+    "popularity": 100
+  },
+  {
+    "name": "Green Leather Haven",
+    "category": "Shoes",
+    "vibe": "Sophisticated Elegance",
+    "id": "green-leather-haven",
+    "image_path": "green-leather-haven.jpg",
+    "description": "shoes, green, leather, none",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant Leather Satchel",
+    "category": "Bags and Luggage",
+    "vibe": "Professional",
+    "id": "elegant-leather-satchel",
+    "image_path": "elegant-leather-satchel.jpeg",
+    "description": "bag, black, leather, none",
+    "popularity": 100
+  },
+  {
+    "name": "Azure Graphic Tee",
+    "category": "Womens clothing",
+    "vibe": "Casual Chic",
+    "id": "azure-graphic-tee",
+    "image_path": "azure-graphic-tee.jpg",
+    "description": "T-shirt, light blue, cotton, graphic",
+    "popularity": 100
+  },
+  {
+    "name": "Geometric Elegance",
+    "category": "Women's Clothing",
+    "vibe": "Modern and Stylish",
+    "id": "geometric-elegance",
+    "image_path": "geometric-elegance.jpg",
+    "description": "dress, black,pink,white, knit, geometric",
+    "popularity": 100
+  },
+  {
+    "name": "Floral Elegance",
+    "category": "Womens clothing",
+    "vibe": "Sassy yet Sophisticated",
+    "id": "floral-elegance",
+    "image_path": "floral-elegance.jpg",
+    "description": "dress, black, cotton, floral",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant Threads",
+    "category": "Womens clothing",
+    "vibe": "Sophisticated and Fashion-forward",
+    "id": "elegant-threads",
+    "image_path": "elegant-threads.jpg",
+    "description": "cap, yellow, fabric, logo",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Perforado Leather Stilettos",
+    "category": "Shoes",
+    "vibe": "Sophisticated and Classic",
+    "id": "elegante-perforado-leather-stilettos",
+    "image_path": "elegante-perforado-leather-stilettos.jpg",
+    "description": "shoes, black, leather, perforated",
+    "popularity": 100
+  },
+  {
+    "name": "Floral Geo Fusion Skirt Collection",
+    "category": "Womens clothing",
+    "vibe": "Elegant and Multicultural",
+    "id": "floral-geo-fusion-skirt-collection",
+    "image_path": "floral-geo-fusion-skirt-collection.jpg",
+    "description": "skirt, multicolor, fabric, floral geometric",
+    "popularity": 100
+  },
+  {
+    "name": "Vivid Elements",
+    "category": "Womens clothing",
+    "vibe": "Elegant and Bold",
+    "id": "vivid-elements",
+    "image_path": "vivid-elements.jpg",
+    "description": "dress, red, navy blue, fabric, stripes, umbrellas",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Stripe Knit Beanie",
+    "category": "Women's Clothing",
+    "vibe": "Classic Chic",
+    "id": "elegante-stripe-knit-beanie",
+    "image_path": "elegante-stripe-knit-beanie.jpg",
+    "description": "beanie, black, knit, stripes",
+    "popularity": 100
+  },
+  {
+    "name": "Classic Stripe Canvas Whites",
+    "category": "Shoes",
+    "vibe": "Casual & Professional",
+    "id": "classic-stripe-canvas-whites",
+    "image_path": "classic-stripe-canvas-whites.jpg",
+    "description": "shoe, white, canvas, striped",
+    "popularity": 100
+  },
+  {
+    "name": "Elegance Stripe",
+    "category": "Womens clothing",
+    "vibe": "Classic & Fashionable",
+    "id": "elegance-stripe",
+    "image_path": "elegance-stripe.jpeg",
+    "description": "tank top, gray, white, cotton, striped",
+    "popularity": 100
+  },
+  {
+    "name": "Sunny Knitwaves",
+    "category": "Womens clothing",
+    "vibe": "Casual yet chic",
+    "id": "sunny-knitwaves",
+    "image_path": "sunny-knitwaves.jpg",
+    "description": "cardigan, orange, blue, knit, striped",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Prints",
+    "category": "Womens clothing",
+    "vibe": "Sophisticated and Feminine",
+    "id": "elegante-prints",
+    "image_path": "elegante-prints.jpg",
+    "description": "dress, pink, silk, print",
+    "popularity": 100
+  },
+  {
+    "name": "Eleganza Beige Satin Gown",
+    "category": "Womens clothing",
+    "vibe": "Luxurious and Formal",
+    "id": "eleganza-beige-satin-gown",
+    "image_path": "eleganza-beige-satin-gown.png",
+    "description": "gown, beige, satin, solid",
+    "popularity": 100
+  },
+  {
+    "name": "Turquoise Blooms",
+    "category": "Womens clothing",
+    "vibe": "Elegant and bohemian",
+    "id": "turquoise-blooms",
+    "image_path": "turquoise-blooms.jpg",
+    "description": "dress, turquoise, fabric, floral",
+    "popularity": 100
+  },
+  {
+    "name": "Classic Red Logo Tee",
+    "category": "Mens clothing",
+    "vibe": "Casual & Fashionable",
+    "id": "classic-red-logo-tee",
+    "image_path": "classic-red-logo-tee.jpg",
+    "description": "T-shirt, red, cotton, logo",
+    "popularity": 100
+  },
+  {
+    "name": "Cannabis Chic White Hat Collection",
+    "category": "Women's Clothing",
+    "vibe": "Boho-Chic",
+    "id": "cannabis-chic-white-hat-collection",
+    "image_path": "cannabis-chic-white-hat-collection.jpg",
+    "description": "hat, white, fabric, cannabis leaves",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant的步伐",
+    "category": "Shoes",
+    "vibe": "Classic and sophisticated",
+    "id": "elegant",
+    "image_path": "elegant.jpg",
+    "description": "shoe, black, leather, pattern",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Sole",
+    "category": "Shoes",
+    "vibe": "Classic Luxury",
+    "id": "elegante-sole",
+    "image_path": "elegante-sole.jpg",
+    "description": "shoe, black, leather, perforated",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant Threads White Embroidered Shirt",
+    "category": "Womens clothing",
+    "vibe": "Sophisticated and refined",
+    "id": "elegant-threads-white-embroidered-shirt",
+    "image_path": "elegant-threads-white-embroidered-shirt.jpg",
+    "description": "shirt, white, fabric, embroidery",
+    "popularity": 100
+  },
+  {
+    "name": "EleganteCape",
+    "category": "Womens clothing",
+    "vibe": "Sophisticated and Classic",
+    "id": "elegantecape",
+    "image_path": "elegantecape.png",
+    "description": "cape, black, fabric, plain",
+    "popularity": 100
+  },
+  {
+    "name": "PureScript Clothing",
+    "category": "Womens clothing",
+    "vibe": "Elegant and refined",
+    "id": "purescript-clothing",
+    "image_path": "purescript-clothing.jpg",
+    "description": "shirt, white, fabric, text",
+    "popularity": 100
+  },
+  {
+    "name": "Blue Cotton Graphic Tee",
+    "category": "Mens clothing",
+    "vibe": "Casual",
+    "id": "blue-cotton-graphic-tee",
+    "image_path": "blue-cotton-graphic-tee.jpg",
+    "description": "T-shirt, blue, cotton, graphic",
+    "popularity": 100
+  },
+  {
+    "name": "Elegant Gray Canvas",
+    "category": "Womens clothing",
+    "vibe": "Classic & Minimalist",
+    "id": "elegant-gray-canvas",
+    "image_path": "elegant-gray-canvas.jpg",
+    "description": "top, light gray, cotton, plain",
+    "popularity": 100
+  },
+  {
+    "name": "Elegante Navy Fabric Blazer",
+    "category": "Mens clothing",
+    "vibe": "Classic Professional",
+    "id": "elegante-navy-fabric-blazer",
+    "image_path": "elegante-navy-fabric-blazer.jpg",
+    "description": "blazer, navy, fabric, solid",
+    "popularity": 100
+  },
+  {
+    "name": "Fiber Fashions",
+    "category": "Womens clothing",
+    "vibe": "Elegant yet Bold",
+    "id": "fiber-fashions",
+    "image_path": "fiber-fashions.jpg",
+    "description": "hat, pink, red, black, white, yarn, stripes",
+    "popularity": 100
+  }
+]

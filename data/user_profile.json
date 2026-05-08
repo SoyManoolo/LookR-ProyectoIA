@@ -1,0 +1,15 @@
+{
+  "user_id": "bsluna_01",
+  "brand_preferences": {
+    "preferred_categories": ["women's clothing", "jewelry", "bags and luggage"],
+    "style_vibe": "Modernista, Minimalista",
+    "max_categories": 5
+  },
+  "boards": [
+    {
+      "board_name": "Barcelona Summer",
+      "products": ["1", "3"],
+      "tags": ["lino", "terraza", "born"]
+    }
+  ]
+}

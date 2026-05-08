@@ -1,0 +1,50 @@
+[
+  {
+    "query": "sweater azul",
+    "product_id": "1",
+    "position": 1,
+    "timestamp": "2026-05-07T10:00:00"
+  },
+  {
+    "query": "sweater azul punto",
+    "product_id": "1",
+    "position": 2,
+    "timestamp": "2026-05-07T10:05:00"
+  },
+  {
+    "query": "blanco invierno",
+    "product_id": "2",
+    "position": 1,
+    "timestamp": "2026-05-07T10:10:00"
+  },
+  {
+    "query": "sweater grueso",
+    "product_id": "2",
+    "position": 3,
+    "timestamp": "2026-05-07T10:15:00"
+  },
+  {
+    "query": "cardigan gris",
+    "product_id": "3",
+    "position": 1,
+    "timestamp": "2026-05-07T10:20:00"
+  },
+  {
+    "query": "prenda de abrigo",
+    "product_id": "3",
+    "position": 2,
+    "timestamp": "2026-05-07T10:25:00"
+  },
+  {
+    "query": "gris lana",
+    "product_id": "3",
+    "position": 1,
+    "timestamp": "2026-05-07T10:30:00"
+  },
+  {
+    "query": "lana",
+    "product_id": "2",
+    "position": 2,
+    "timestamp": "2026-05-07T10:35:00"
+  }
+]
