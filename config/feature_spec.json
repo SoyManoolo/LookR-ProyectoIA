@@ -1,0 +1,19 @@
+{
+  "features": [
+    {
+      "name": "bm25_score",
+      "type": "float",
+      "description": "Puntuación de relevancia léxica de Tantivy"
+    },
+    {
+      "name": "popularity",
+      "type": "float",
+      "description": "Número de clics o ventas del producto"
+    }
+  ],
+  "target": "click_weight",
+  "metadata": {
+    "version": "1.0.0",
+    "description": "Contrato inicial para el ranking de buscador de ropa"
+  }
+}
