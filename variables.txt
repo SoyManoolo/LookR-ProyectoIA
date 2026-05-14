@@ -1,0 +1,5 @@
+#OLLAMA_URL = http://192.168.1.22:11434/v1
+#OLLAMA_URL = http://127.0.0.1:11434/v1
+#https://huggingface.co/jc-builds/Qwen3.5-9B-VLM-Q4_K_M-GGUF
+#gemma4:31b prod
+#gemma4:e4b
