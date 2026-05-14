@@ -1,0 +1,122 @@
+[
+ {
+   "id": "prod-001",
+   "nombre": "Camiseta roja Adidas",
+   "descripcion": "Camiseta deportiva roja de Adidas. Un basico esencial para looks casuales, comodos y llenos de energia.",
+   "marca": "Adidas",
+   "categorias": ["camiseta", "casual", "deportivo"],
+   "estilo": "casual deportivo",
+   "carpeta": "camisetas",
+   "imagen": "data/images/classic-red-logo-tee.jpg"
+ },
+ {
+   "id": "prod-002",
+   "nombre": "Camiseta azul de futbol",
+   "descripcion": "Camiseta azul tipo crew neck con estampado deportivo de futbol. Diseno casual para el dia a dia activo.",
+   "marca": "Sportline",
+   "categorias": ["camiseta", "casual", "deportivo"],
+   "estilo": "deportivo casual",
+   "carpeta": "camisetas",
+   "imagen": "data/images/blue-cotton-graphic-tee.jpg"
+ },
+ {
+   "id": "prod-003",
+   "nombre": "Camiseta blanca basica",
+   "descripcion": "Camiseta blanca esencial y versatil, ideal para construir cualquier look casual sin esfuerzo.",
+   "marca": "Basic Cotton",
+   "categorias": ["camiseta", "casual"],
+   "estilo": "casual esencial",
+   "carpeta": "camisetas",
+   "imagen": "data/images/crisp-white-cotton-tee.jpg"
+ },
+ {
+   "id": "prod-004",
+   "nombre": "Zapatillas blancas de lona",
+   "descripcion": "Zapatillas deportivas blancas de lona. Comodas, frescas y faciles de combinar con looks casuales.",
+   "marca": "Urban Walk",
+   "categorias": ["zapatos", "deportivas", "casual"],
+   "estilo": "casual deportivo",
+   "carpeta": "calzado",
+   "imagen": "data/images/classic-stripe-canvas-whites.jpg"
+ },
+ {
+   "id": "prod-005",
+   "nombre": "Zapatos Oxford negros",
+   "descripcion": "Zapatos Oxford negros de cuero con diseno elegante y versatil para atuendos formales o casuales.",
+   "marca": "Elegante",
+   "categorias": ["zapatos", "formal", "elegante", "casual"],
+   "estilo": "formal casual",
+   "carpeta": "calzado",
+   "imagen": "data/images/elegante-sole.jpg"
+ },
+ {
+   "id": "prod-006",
+   "nombre": "Blusa blanca bordada",
+   "descripcion": "Blusa blanca fresca con detalles bordados en azul y amarillo. Perfecta para un estilo casual veraniego.",
+   "marca": "Boho Threads",
+   "categorias": ["blusa", "casual", "top"],
+   "estilo": "casual veraniego",
+   "carpeta": "blusas",
+   "imagen": "data/images/elegant-threads-white-embroidered-shirt.jpg"
+ },
+ {
+   "id": "prod-007",
+   "nombre": "Blazer azul marino",
+   "descripcion": "Blazer clasico y estructurado en tono oscuro para reuniones, eventos y looks smart casual.",
+   "marca": "Executive",
+   "categorias": ["chaqueta", "formal", "casual", "elegante"],
+   "estilo": "clasico ejecutivo",
+   "carpeta": "chaquetas",
+   "imagen": "data/images/elegante-navy-fabric-blazer.jpg"
+ },
+ {
+   "id": "prod-008",
+   "nombre": "Vestido floral midi",
+   "descripcion": "Vestido floral de manga larga con silueta midi y estampado primaveral para looks casuales de dia.",
+   "marca": "Flora",
+   "categorias": ["vestido", "casual"],
+   "estilo": "floral casual",
+   "carpeta": "vestidos",
+   "imagen": "data/images/floral-elegance.jpg"
+ },
+ {
+   "id": "prod-009",
+   "nombre": "Vestido rosa con volantes",
+   "descripcion": "Vestido fluido en rosa pastel con estampado grafico, volantes y detalle smock para un look femenino.",
+   "marca": "Elegante",
+   "categorias": ["vestido", "casual", "elegante"],
+   "estilo": "casual primaveral",
+   "carpeta": "vestidos",
+   "imagen": "data/images/elegante-prints.jpg"
+ },
+ {
+   "id": "prod-010",
+   "nombre": "Bolso de cuero verde",
+   "descripcion": "Bolso de cuero verde con acabado elegante, perfecto como accesorio para completar conjuntos casuales o arreglados.",
+   "marca": "Green Haven",
+   "categorias": ["bolso", "accesorio", "casual", "elegante"],
+   "estilo": "casual elegante",
+   "carpeta": "accesorios",
+   "imagen": "data/images/green-leather-haven.jpg"
+ },
+ {
+   "id": "prod-011",
+   "nombre": "Gorra amarilla Loro Parque",
+   "descripcion": "Gorra de beisbol amarilla con diseno tematico. Accesorio casual y deportivo para paseos al aire libre.",
+   "marca": "Loro Parque",
+   "categorias": ["accesorio", "casual", "deportivo"],
+   "estilo": "casual deportivo",
+   "carpeta": "accesorios",
+   "imagen": "data/images/elegant-threads.jpg"
+ },
+ {
+   "id": "prod-012",
+   "nombre": "Falda geometrica colorida",
+   "descripcion": "Falda vibrante con estampado etnico geometrico, ideal para aportar un toque bohemio a conjuntos casuales.",
+   "marca": "Colorweave",
+   "categorias": ["falda", "casual"],
+   "estilo": "bohemio casual",
+   "carpeta": "faldas",
+   "imagen": "data/images/colorweave-geometrics.jpg"
+ }
+]
