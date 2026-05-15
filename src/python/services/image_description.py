@@ -1,64 +1,31 @@
 from __future__ import annotations
 
-import argparse
 import json
-import logging
 import mimetypes
 import os
 from pathlib import Path
-from typing import Literal
 
-from dotenv import load_dotenv
-from pydantic import BaseModel
 from pydantic_ai import Agent, BinaryContent
 from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.providers.ollama import OllamaProvider
 
-
-logging.basicConfig(level=logging.INFO)
-load_dotenv()
-
-
-Categoria = Literal[
-    "vestido",
-    "chaqueta",
-    "pantalón",
-    "camisa",
-    "camiseta",
-    "blusa",
-    "falda",
-    "abrigo",
-    "traje",
-    "jersey",
-    "sudadera",
-    "top",
-    "zapatos",
-    "bota",
-    "deportivas",
-    "accesorio",
-    "bolso",
-    "joyería",
-    "gafas",
-    "elegante",
-    "casual",
-    "formal",
-    "deportivo",
-    "noche",
-    "otro",
-]
-
-categorias_permitidas = Categoria.__args__
-
-
-class DescripcionRopa(BaseModel):
-    descripcion: str
-    categoria: list[Categoria]
-    estilo: str
+from core.config import (
+    DEFAULT_EXAMPLES_PATH,
+    DEFAULT_OLLAMA_BASE_URL,
+    DEFAULT_OLLAMA_MODEL,
+    IMAGES_DIR,
+    PROJECT_ROOT,
+)
+from models.fashion import DescripcionRopa, categorias_permitidas
 
 
 def cargar_ejemplos_entrenamiento(path: str | Path | None = None, limite: int = 3) -> str:
     """Carga pocos ejemplos JSONL para guiar al modelo sin fine tuning completo."""
-    examples_path = Path(path or os.getenv("TRAINING_EXAMPLES_PATH", "data/examples/training_examples.jsonl"))
+    configured_path = path or os.getenv("TRAINING_EXAMPLES_PATH")
+    examples_path = Path(configured_path) if configured_path else DEFAULT_EXAMPLES_PATH
+    if not examples_path.is_absolute():
+        examples_path = PROJECT_ROOT / examples_path
+
     if not examples_path.exists():
         return ""
 
@@ -82,12 +49,8 @@ def cargar_ejemplos_entrenamiento(path: str | Path | None = None, limite: int = 
 
 
 def crear_agente() -> Agent:
-    url = (
-        os.getenv("OLLAMA_BASE_URL")
-        or os.getenv("OLLAMA_LOCAL")
-        or "http://localhost:11434/v1"
-    )
-    model_name = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
+    url = os.getenv("OLLAMA_BASE_URL", DEFAULT_OLLAMA_BASE_URL).rstrip("/")
+    model_name = os.getenv("OLLAMA_MODEL", DEFAULT_OLLAMA_MODEL)
     contexto_ejemplos = cargar_ejemplos_entrenamiento()
 
     model = OllamaModel(
@@ -128,19 +91,10 @@ def describir_imagen_bytes(image_bytes: bytes, media_type: str = "image/png") ->
 
 def describir_imagen(image_path: str | Path) -> DescripcionRopa:
     path = Path(image_path)
-    if not path.exists() and path.parent == Path("data"):
-        path = Path("data/images") / path.name
+    if not path.is_absolute():
+        candidates = [Path.cwd() / path, PROJECT_ROOT / path]
+        if path.parent == Path("data"):
+            candidates.append(IMAGES_DIR / path.name)
+        path = next((candidate for candidate in candidates if candidate.exists()), PROJECT_ROOT / path)
+
     return describir_imagen_bytes(path.read_bytes(), detectar_media_type(path))
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Describe una imagen de ropa y devuelve JSON.")
-    parser.add_argument("image", nargs="?", default="data/images/unnamed.png", help="Ruta de la imagen")
-    args = parser.parse_args()
-
-    datos = describir_imagen(args.image)
-    print(datos.model_dump_json(indent=2))
-
-
-if __name__ == "__main__":
-    main()
