@@ -1,4 +1,6 @@
+import json
 import mimetypes
+import re
 
 from pathlib import Path
 from pydantic_ai import Agent, BinaryContent
@@ -17,10 +19,17 @@ def detectar_media_type(image_path: str | Path) -> str:
 # Función para enviar los bytes de la imagen al agente y obtener la descripción estructurada
 def describir_imagen_bytes(agent: Agent, image_bytes: bytes, media_type: str = "image/png") -> DescripcionRopa:
     """Envía los bytes de una imagen al agente y obtiene una descripción estructurada de la prenda."""
-    # Ejecutamos el agente de forma síncrona, pasando los bytes de la imagen como contenido binario
     result = agent.run_sync([BinaryContent(data=image_bytes, media_type=media_type)])
-    # Devolvemos solo la salida estructura con descripción, categoría y estilo
-    return result.output
+    texto = result.output.strip()
+    # Extraemos el JSON si el modelo lo envuelve en bloque de código markdown
+    match = re.search(r'```(?:json)?\s*(\{.*?\})\s*```', texto, re.DOTALL)
+    if match:
+        texto = match.group(1)
+    data = json.loads(texto)
+    # Algunos modelos devuelven categoria como string en lugar de lista
+    if isinstance(data.get("categoria"), str):
+        data["categoria"] = [data["categoria"]]
+    return DescripcionRopa.model_validate(data)
 
 # Función principal que recibe una ruta de imagen, lee sus bytes y llama al análisis del agente
 def describir_imagen(agent: Agent, image_path: str | Path) -> DescripcionRopa:
