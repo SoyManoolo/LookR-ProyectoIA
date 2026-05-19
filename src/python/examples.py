@@ -1,12 +1,12 @@
 import json
+import os
 from pathlib import Path
-from config import settings
 
 # Función para cargar unos ejemplos de descripción para que el agente tenga algunos ejemplos, ya que no se hace fine tuning
 def cargar_ejemplos_entrenamiento(path: str | Path | None = None, limite: int = 3) -> str:
     """Carga pocos ejemplos JSONL para guiar al modelo sin fine tuning completo."""
     # Obtenemos la ruta del archivo de ejemplos desde variable de entorno o usamos la ruta por defecto
-    examples_path = settings.TRAINING_EXAMPLES_PATH
+    examples_path = Path(path or os.getenv("TRAINING_EXAMPLES_PATH", "data/examples/training_examples.jsonl"))
     # En caso de que el path no exista devolvemos un string vacio
     if not examples_path.exists():
         return ""
