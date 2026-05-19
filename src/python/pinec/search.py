@@ -1,59 +1,59 @@
 import argparse
 
-from index import crear_index
+try:
+    from .index import crear_index
+    from .embeddings import embed_texto, embed_imagen
+except ImportError:
+    from index import crear_index
+    from embeddings import embed_texto, embed_imagen
 
-# Obtenemos el índice de Pinecone al cargar este módulo
 dense_index = crear_index()
 
-# Función para hacer búsquedas semánticas en el índice
-def search(query):
-    """Busca registros en Pinecone usando búsqueda semántica por texto.
-    
+
+def search(query: str, por_imagen: bool = False, top_k: int = 5) -> list[tuple]:
+    """Busca prendas similares por texto o por imagen usando embeddings CLIP.
+
     Args:
-        query: Texto de búsqueda (p.ej. 'rojo', 'camisa elegante')
-        
+        query: Texto de búsqueda o ruta a una imagen.
+        por_imagen: Si True, trata query como ruta de imagen.
+        top_k: Número de resultados a devolver.
+
     Returns:
-        Lista de tuplas con (id, score, nombre, descripción) de los resultados
+        Lista de tuplas (id, score, nombre, descripcion).
     """
-    # Ejecutamos la búsqueda en el índice usando el texto como query
-    results = dense_index.search(
-        # Especificamos el namespace donde están nuestros registros
+    vector = embed_imagen(query) if por_imagen else embed_texto(query)
+
+    results = dense_index.query(
         namespace="mi-espacio",
-        # Solicitamos los 5 resultados más relevantes
-        top_k=5,
-        # Pasamos el texto de búsqueda que será embebido automáticamente
-        inputs={"text": query}
+        vector=vector,
+        top_k=top_k,
+        include_metadata=True,
     )
 
-    # Procesamos los resultados para extraer información útil
-    formateados = []
-    # Iteramos sobre cada resultado (hit) encontrado
-    for hit in results['result']['hits']:
-        # Extraemos el nombre de la prenda (N/A si no existe el campo)
-        nombre = hit['fields'].get('nombre', 'N/A')
-        # Extraemos la descripción de la prenda (N/A si no existe el campo)
-        desc = hit['fields'].get('descripcion', 'N/A')
-        # Creamos una tupla con información relevante: id, score de similitud, nombre, descripción
-        formateados.append((hit['id'], hit['score'], nombre, desc))
-    # Retornamos la lista formateada de resultados
-    return formateados
+    return [
+        (
+            m["id"],
+            m["score"],
+            m["metadata"].get("nombre", "N/A"),
+            m["metadata"].get("descripcion", "N/A"),
+            m["metadata"].get("imagen", ""),
+            m["metadata"].get("categoria", []),
+            m["metadata"].get("estilo", ""),
+        )
+        for m in results["matches"]
+    ]
 
-# Función principal para ejecutar búsquedas desde línea de comandos
+
 def main():
-    """Interfaz de línea de comandos para hacer búsquedas en Pinecone."""
-    # Creamos el parser de argumentos de línea de comandos
     parser = argparse.ArgumentParser()
-    # Añadimos el argumento posicional 'query' para el texto de búsqueda
-    parser.add_argument("query", help="Texto de búsqueda")
-    # Parseamos los argumentos proporcionados
+    parser.add_argument("query", help="Texto de búsqueda o ruta de imagen")
+    parser.add_argument("--imagen", action="store_true", help="Buscar por imagen")
     args = parser.parse_args()
 
-    # Ejecutamos la búsqueda con el texto proporcionado
-    resultados = search(args.query)
-    # Mostramos cada resultado en pantalla
+    resultados = search(args.query, por_imagen=args.imagen)
     for item in resultados:
         print(item)
 
-# Condición para ejecutar solo cuando el script se lanza directamente
+
 if __name__ == "__main__":
     main()
