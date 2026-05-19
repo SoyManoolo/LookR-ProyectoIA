@@ -1,18 +1,14 @@
 from pinecone import Pinecone
 from dotenv import load_dotenv
-import os
+
+from config import settings
 
 # Función para crear o acceder al índice de Pinecone
 def crear_index():
     """Crea un nuevo índice en Pinecone o retorna uno existente para búsquedas vectoriales."""
-    # Cargamos las variables de entorno desde el archivo .env
-    load_dotenv()
-
-    # Obtenemos la API key de Pinecone desde las variables de entorno
-    apikey = os.getenv("PINECONE_APIKEY")
 
     # Instanciamos el cliente de Pinecone con la API key
-    pc = Pinecone(api_key=apikey)
+    pc = Pinecone(api_key=settings.PINECONE_APIKEY)
 
     # Definimos el nombre del índice que usaremos
     index_name = "buscador"

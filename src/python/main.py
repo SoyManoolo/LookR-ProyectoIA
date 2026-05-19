@@ -3,15 +3,11 @@ from __future__ import annotations
 import argparse
 import logging
 
-from dotenv import load_dotenv
-
 from image_utils import describir_imagen
 from agent import crear_agente
 
 # Configuramos el logging para mostrar mensajes informativos
 logging.basicConfig(level=logging.INFO)
-# Cargamos las variables de entorno del archivo .env
-load_dotenv()
 
 # Función principal que ejecuta el script desde la línea de comandos
 def main() -> None:

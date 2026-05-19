@@ -1,24 +1,19 @@
-import os
-
 from pydantic_ai import Agent
 from pydantic_ai.models.ollama import OllamaModel
 from pydantic_ai.providers.ollama import OllamaProvider
 
 from categories import DescripcionRopa, categorias_permitidas
 from examples import cargar_ejemplos_entrenamiento
+from config import settings
 
 # Función para crear el agente de IA especializado en describir prendas de ropa
 def crear_agente() -> Agent:
     # Cargamos la URL base de Ollama desde las variables de entorno, con valores por defecto
     # Prioridad: OLLAMA_BASE_URL > OLLAMA_LOCAL > URL local por defecto
-    url = (
-        os.getenv("OLLAMA_BASE_URL")
-        or os.getenv("OLLAMA_LOCAL")
-        or "http://localhost:11434/v1"
-    )
+    url = settings.OLLAMA_URL
 
     # Cargamos el nombre del modelo desde las variables de entorno, con gemma4:e4b como valor por defecto
-    model_name = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
+    model_name = settings.OLLAMA_MODEL
     # Cargamos algunos ejemplos del JSON de entrenamiento para que el agente siga un estilo consistente
     contexto_ejemplos = cargar_ejemplos_entrenamiento()
 
