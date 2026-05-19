@@ -2,12 +2,18 @@ from __future__ import annotations
 
 import argparse
 import logging
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 from image_utils import describir_imagen
 from agent import crear_agente
+from pinec.upload_data import subir_prenda
 
 # Configuramos el logging para mostrar mensajes informativos
 logging.basicConfig(level=logging.INFO)
+# Cargamos las variables de entorno del archivo .env
+load_dotenv(Path(__file__).parent.parent.parent / "data" / ".env")
 
 # Función principal que ejecuta el script desde la línea de comandos
 def main() -> None:
@@ -16,15 +22,15 @@ def main() -> None:
     agent = crear_agente()
     # Configuramos el parser de argumentos de línea de comandos
     parser = argparse.ArgumentParser(description="Describe una imagen de ropa y devuelve JSON.")
-    # Añadimos el argumento posicional 'image' con valor por defecto
-    parser.add_argument("image", nargs="?", default="data/images/unnamed.png", help="Ruta de la imagen")
-    # Parseamos los argumentos pasados al script
+    parser.add_argument("images", nargs="+", help="Ruta(s) de imagen")
     args = parser.parse_args()
 
-    # Llamamos a la función que describe la imagen con la ruta proporcionada
-    datos = describir_imagen(agent, args.image)
-    # Mostramos el resultado en formato JSON indentado para mejor legibilidad
-    print(datos.model_dump_json(indent=2))
+    for ruta in args.images:
+        print(f"\n=== {ruta} ===")
+        datos = describir_imagen(agent, ruta)
+        print(datos.model_dump_json(indent=2))
+        record_id = subir_prenda(datos, ruta)
+        print(f"Subido a Pinecone con id: {record_id}")
 
 
 # Condición para ejecutar solo cuando el script se lanza directamente, no cuando se importa
