@@ -8,11 +8,14 @@ Lookr es un sistema de búsqueda y recomendación de prendas que combina visión
 
 - **Búsqueda híbrida por texto** — combina similitud visual (CLIP), semántica multilingüe y matching por palabras clave
 - **Búsqueda por imagen** — encuentra prendas visualmente similares usando CLIP
+- **Búsqueda combinada** — imagen base + modificador de texto (ej. "pero en azul, más formal")
 - **Inspiración** — sube cualquier foto, el agente la analiza y recomienda prendas similares del catálogo sin añadirla
 - **Mi armario** — espacio personal por usuario: sube prendas propias, el agente las describe y quedan indexadas en un namespace privado de Pinecone
 - **Similares desde el armario** — busca en el catálogo prendas que combinan con cualquier prenda del armario personal
 - **Favoritos** — guarda prendas con ♥ en una wishlist persistente (localStorage)
+- **Filtros por categoría** — filtra los resultados por tipo de prenda sin nueva búsqueda
 - **Modal de detalle** — vista ampliada de cada prenda con descripción completa y categorías
+- **Carga masiva** — script `upload_batch.py` para poblar el catálogo desde una carpeta de imágenes
 
 ---
 
@@ -21,11 +24,13 @@ Lookr es un sistema de búsqueda y recomendación de prendas que combina visión
 | Componente | Tecnología |
 |---|---|
 | Agente IA | pydantic-ai + Ollama (`gemma3:12b`) |
-| Embeddings visuales | CLIP `clip-ViT-B-32` (GPU) — 512d |
+| Embeddings visuales | CLIP `clip-ViT-B-32` (CPU) — 512d |
 | Embeddings semánticos | `paraphrase-multilingual-mpnet-base-v2` (CPU) — 768d |
 | Base de datos vectorial | Pinecone serverless (AWS us-east-1) |
 | Backend | FastAPI + uvicorn |
-| Frontend | HTML / CSS / JS |
+| Frontend | HTML + CSS + JS (archivos separados) |
+
+> **Nota sobre GPU**: CLIP y el modelo semántico corren en CPU para ceder la VRAM completa a Ollama. Con una GPU de ≥8 GB y sin necesidad de ejecutar el agente simultáneamente, se pueden mover a GPU cambiando `device="cpu"` en `pinec/embeddings.py`.
 
 ### Índices Pinecone
 
@@ -62,10 +67,12 @@ ProyectoIA/
         ├── examples.py               # Carga de ejemplos de estilo para el agente
         ├── main.py                   # CLI para analizar imágenes desde terminal
         ├── reindexar.py              # Script de reindexación masiva del catálogo
+        ├── upload_batch.py           # Carga masiva de imágenes al catálogo
         ├── static/
-        │   └── index.html            # Interfaz web completa
+        │   ├── index.html            # Estructura HTML de la interfaz
+        │   ├── styles.css            # Estilos (variables, layout, cards, modal)
+        │   └── app.js                # Lógica de la interfaz (búsquedas, armario, modal)
         └── pinec/
-            ├── __init__.py
             ├── index.py              # Creación de índices Pinecone
             ├── embeddings.py         # Modelos CLIP y multilingual
             ├── upload_data.py        # Subida a ambos índices Pinecone
@@ -81,7 +88,7 @@ ProyectoIA/
 - Python 3.12+
 - [Ollama](https://ollama.com) con el modelo `gemma3:12b` descargado
 - Cuenta en [Pinecone](https://pinecone.io) con API key
-- GPU NVIDIA recomendada (CUDA 12.x) para CLIP
+- GPU NVIDIA recomendada (CUDA 12.x) para Ollama
 
 ### Pasos
 
@@ -107,8 +114,11 @@ cp data/.env.example data/.env
 OLLAMA_BASE_URL=http://localhost:11434/v1
 OLLAMA_LOCAL=http://localhost:11434/v1
 OLLAMA_MODEL=gemma3:12b
+OLLAMA_KEEP_ALIVE=5m
 PINECONE_APIKEY=tu_api_key_aqui
 ```
+
+`OLLAMA_KEEP_ALIVE` controla cuánto tiempo Ollama retiene el modelo en VRAM tras la última llamada. Usar `0` para liberar VRAM inmediatamente; `5m` es el valor recomendado para uso interactivo.
 
 ---
 
@@ -130,12 +140,13 @@ La interfaz estará disponible en [http://localhost:8000](http://localhost:8000)
 
 | Método | Endpoint | Descripción |
 |---|---|---|
-| `GET` | `/recomendar/texto?query=...` | Búsqueda híbrida por texto |
+| `GET` | `/recomendar/texto?query=...&top_k=5` | Búsqueda híbrida por texto |
+| `POST` | `/recomendar/texto` | Búsqueda híbrida por texto (form data) |
 | `POST` | `/recomendar/imagen` | Búsqueda visual por imagen subida |
+| `POST` | `/recomendar/combinado` | Imagen base + modificador de texto (`alpha` controla el peso) |
 | `POST` | `/descubrir` | Analiza foto + recomienda similares (sin indexar) |
 | `POST` | `/analizar` | Analiza imagen y la añade al catálogo |
-| `GET` | `/imagen/{filename}` | Sirve imágenes del catálogo |
-| `GET` | `/imagen/armario/{filename}` | Sirve imágenes del armario personal |
+| `GET` | `/imagen/{filepath}` | Sirve imágenes desde cualquier subdirectorio de `data/` |
 
 ### Armario personal
 
@@ -158,10 +169,12 @@ Cada búsqueda por texto combina tres capas:
 Score final = 0.20 × visual (CLIP) + 0.50 × semántico (multilingual) + 0.30 × keyword (metadatos)
 ```
 
-- **Visual**: CLIP traduce la query a inglés y busca por similitud de imagen
-- **Semántico**: modelo multilingüe entiende el español directamente
+- **Visual**: CLIP traduce la query a inglés y busca por similitud de embedding de imagen
+- **Semántico**: modelo multilingüe entiende el español directamente sin traducción
 - **Keyword**: boost cuando la query coincide con descripción, categorías o estilo
 - **Contextual**: queries como "outfit para una boda" se expanden con Ollama antes de embedear
+
+La búsqueda **combinada** (imagen + texto) mezcla los vectores con un parámetro `alpha` (por defecto `0.7` = 70% imagen, 30% texto).
 
 ---
 
@@ -177,6 +190,30 @@ Cada usuario tiene un espacio privado identificado por un UUID generado en el na
 
 ---
 
+## Carga masiva de imágenes
+
+Para poblar el catálogo desde una carpeta de imágenes (JPG, PNG, WEBP):
+
+```bash
+cd src/python
+
+# Primera carga
+python3 upload_batch.py --carpeta ../../data/fotos_tienda
+
+# Reanudar una carga interrumpida (omite las ya procesadas)
+python3 upload_batch.py --carpeta ../../data/fotos_tienda --reanudar
+
+# Limitar el número de imágenes por ejecución
+python3 upload_batch.py --carpeta ../../data/fotos_tienda --limite 50 --reanudar
+
+# Orden aleatorio (mayor variedad en lotes pequeños)
+python3 upload_batch.py --carpeta ../../data/fotos_tienda --limite 50 --reanudar --aleatorio
+```
+
+El script registra las imágenes procesadas en `.upload_log.json` dentro de la carpeta para evitar duplicados entre ejecuciones. Fuerza CPU en embeddings para no competir con Ollama por VRAM.
+
+---
+
 ## Reindexación
 
 Para re-analizar las imágenes del catálogo con el agente y regenerar ambos índices:
@@ -188,7 +225,7 @@ python3 reindexar.py "Captura*"      # Solo imágenes cuyo nombre coincida con e
 python3 reindexar.py                 # Solo imágenes con nombre sin slug legible
 ```
 
-### Eliminar una entrada duplicada de Pinecone
+### Eliminar una entrada de Pinecone
 
 ```python
 # Desde src/python/
@@ -197,9 +234,9 @@ from pinec.index import crear_index, crear_index_semantico
 dense    = crear_index()
 semantic = crear_index_semantico()
 
-dup_id = "id-del-vector-a-eliminar"
-dense.delete(ids=[dup_id], namespace="mi-espacio")
-semantic.delete(ids=[dup_id], namespace="mi-espacio")
+item_id = "id-del-vector-a-eliminar"
+dense.delete(ids=[item_id], namespace="mi-espacio")
+semantic.delete(ids=[item_id], namespace="mi-espacio")
 ```
 
 ---
@@ -235,7 +272,7 @@ String json = agent.describeImage(Paths.get("data/images/bolso.jpeg"));
 
 Al arrancar la API por primera vez se descargan:
 
-- `clip-ViT-B-32` (~340 MB) — embeddings visuales, cargado en GPU
+- `clip-ViT-B-32` (~340 MB) — embeddings visuales, cargado en CPU
 - `paraphrase-multilingual-mpnet-base-v2` (~280 MB) — embeddings semánticos, cargado en CPU
 
 Los modelos se cachean en `~/.cache/huggingface/`.
