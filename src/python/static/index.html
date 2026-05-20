@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lookr</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,500;1,400&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+
+<header>
+  <span class="logo">Look<em>r</em></span>
+  <span class="header-tag">Buscador de moda</span>
+</header>
+
+<div class="hero">
+  <h1 class="hero-title">Encuentra la prenda<br /><em>perfecta</em> para ti</h1>
+  <p class="hero-sub">Busca por descripción, por imagen, o añade nuevas prendas al catálogo.</p>
+</div>
+
+<div class="search-container">
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('texto')"><i data-lucide="search"></i> Texto</button>
+    <button class="tab"        onclick="switchTab('imagen')"><i data-lucide="camera"></i> Imagen</button>
+    <button class="tab"        onclick="switchTab('inspiracion')"><i data-lucide="sparkles"></i> Inspiración</button>
+    <button class="tab"        onclick="switchTab('armario')"><i data-lucide="shirt"></i> Mi armario</button>
+    <button class="tab"        onclick="switchTab('favoritos')"><i data-lucide="heart"></i> Favoritos</button>
+  </div>
+
+  <!-- Panel: buscar por texto -->
+  <div id="panel-texto" class="panel active">
+    <div class="search-bar">
+      <span class="search-bar-icon"><i data-lucide="search"></i></span>
+      <input type="text" id="input-texto" placeholder="ej. vestido floral elegante, chaqueta azul marino…" />
+      <button class="btn-primary" id="btn-texto" onclick="buscarTexto()">Buscar</button>
+    </div>
+    <div class="hints">
+      <span class="hint-chip" onclick="setQuery('falda roja casual')">falda roja casual</span>
+      <span class="hint-chip" onclick="setQuery('chaqueta elegante')">chaqueta elegante</span>
+      <span class="hint-chip" onclick="setQuery('vestido floral')">vestido floral</span>
+      <span class="hint-chip" onclick="setQuery('zapatos formales')">zapatos formales</span>
+      <span class="hint-chip" onclick="setQuery('bolso de cuero')">bolso de cuero</span>
+    </div>
+  </div>
+
+  <!-- Panel: buscar por imagen -->
+  <div id="panel-imagen" class="panel">
+    <div class="upload-zone" id="upload-zone-buscar"
+         onclick="document.getElementById('file-buscar').click()">
+      <input type="file" id="file-buscar" accept="image/*" onchange="onFileSelect(event,'buscar')" />
+      <img class="preview-img" id="preview-buscar" alt="" />
+      <div id="placeholder-buscar">
+        <div class="upload-icon-wrap"><i data-lucide="camera"></i></div>
+        <div class="upload-label">Sube una foto de la prenda</div>
+        <div class="upload-sublabel">JPG · PNG · WEBP</div>
+      </div>
+    </div>
+    <div class="modificador-wrap">
+      <div class="modificador-label"><i data-lucide="sliders-horizontal"></i> Modificar búsqueda <span class="modificador-opcional">(opcional)</span></div>
+      <div class="search-bar modificador-bar">
+        <span class="search-bar-icon"><i data-lucide="type"></i></span>
+        <input type="text" id="input-modificador" placeholder="ej. pero en azul, más formal, con flores…" />
+      </div>
+      <div class="modificador-chips">
+        <span class="hint-chip" onclick="setModificador('pero en azul')">en azul</span>
+        <span class="hint-chip" onclick="setModificador('pero en rojo')">en rojo</span>
+        <span class="hint-chip" onclick="setModificador('más formal')">más formal</span>
+        <span class="hint-chip" onclick="setModificador('más casual')">más casual</span>
+        <span class="hint-chip" onclick="setModificador('con estampado floral')">floral</span>
+      </div>
+    </div>
+    <button class="btn-block" id="btn-imagen" onclick="buscarImagen()" disabled>
+      Buscar prendas similares
+    </button>
+  </div>
+
+  <!-- Panel: inspiración -->
+  <div id="panel-inspiracion" class="panel">
+    <div class="upload-zone" id="upload-zone-inspiracion"
+         onclick="document.getElementById('file-inspiracion').click()">
+      <input type="file" id="file-inspiracion" accept="image/*" onchange="onFileSelect(event,'inspiracion')" />
+      <img class="preview-img" id="preview-inspiracion" alt="" />
+      <div id="placeholder-inspiracion">
+        <div class="upload-icon-wrap"><i data-lucide="sparkles"></i></div>
+        <div class="upload-label">Sube una foto de inspiración</div>
+        <div class="upload-sublabel">Buscaremos prendas similares en el catálogo</div>
+      </div>
+    </div>
+    <div class="analyzing-msg" id="analyzing-msg">
+      <i data-lucide="loader-circle" class="spin"></i> Analizando tu foto… esto puede tardar unos segundos
+    </div>
+    <button class="btn-block" id="btn-inspiracion" onclick="descubrir()" disabled>
+      Descubrir prendas similares
+    </button>
+    <!-- Análisis breve -->
+    <div class="analisis-result" id="analisis-result">
+      <img class="analisis-img" id="analisis-img" alt="" />
+      <div class="analisis-body">
+        <div class="analisis-badge"><i data-lucide="sparkles"></i> Tu estilo detectado</div>
+        <div class="analisis-desc" id="analisis-desc"></div>
+        <div class="analisis-tags" id="analisis-tags"></div>
+        <div class="analisis-estilo" id="analisis-estilo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: mi armario -->
+  <div id="panel-armario" class="panel">
+    <div class="favoritos-header">
+      <span class="favoritos-titulo">Mi armario personal</span>
+    </div>
+    <div class="upload-zone" id="upload-zone-armario"
+         onclick="document.getElementById('file-armario').click()" style="margin-bottom:12px">
+      <input type="file" id="file-armario" accept="image/*" onchange="onFileSelect(event,'armario')" />
+      <img class="preview-img" id="preview-armario" alt="" />
+      <div id="placeholder-armario">
+        <div class="upload-icon-wrap"><i data-lucide="shirt"></i></div>
+        <div class="upload-label">Sube una prenda de tu armario</div>
+        <div class="upload-sublabel">Se guardará en tu espacio personal</div>
+      </div>
+    </div>
+    <div class="analyzing-msg" id="analyzing-armario">
+      <i data-lucide="loader-circle" class="spin"></i> Analizando prenda…
+    </div>
+    <button class="btn-block" id="btn-armario" onclick="agregarAlArmario()" disabled>
+      Guardar en mi armario
+    </button>
+    <div class="armario-grid" id="armario-grid"></div>
+    <div class="favoritos-empty" id="armario-empty">
+      Tu armario está vacío. Sube prendas que ya tienes para recibir recomendaciones personalizadas.
+    </div>
+  </div>
+
+  <!-- Panel: favoritos -->
+  <div id="panel-favoritos" class="panel">
+    <div class="favoritos-header">
+      <span class="favoritos-titulo">Tus prendas guardadas</span>
+      <button class="btn-clear-fav" onclick="limpiarFavoritos()">Vaciar lista</button>
+    </div>
+    <div class="cards" id="cards-favoritos"></div>
+    <div class="favoritos-empty" id="favoritos-empty">
+      Aún no tienes prendas guardadas. Pulsa <i data-lucide="heart"></i> en cualquier resultado para guardarlas aquí.
+    </div>
+  </div>
+
+</div><!-- /search-container -->
+
+<!-- Results -->
+<div class="results-section">
+  <div class="notice error"   id="error-msg"></div>
+  <div class="notice success" id="success-msg"></div>
+
+  <div class="results-header" id="results-header">
+    <div class="results-header-top">
+      <span class="results-count" id="results-count"></span>
+    </div>
+    <div class="filtros" id="filtros"></div>
+  </div>
+
+  <div class="skeleton-grid" id="skeleton">
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+    <div class="skeleton-card"><div class="skeleton-img shimmer"></div><div class="skeleton-body"><div class="skeleton-line w30 shimmer"></div><div class="skeleton-line w60 shimmer"></div><div class="skeleton-line w80 shimmer"></div><div class="skeleton-line w50 shimmer"></div></div></div>
+  </div>
+
+  <div class="cards" id="cards"></div>
+</div>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-img-wrap" id="modal-img-wrap">
+      <button class="modal-close" onclick="closeModal()"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="modal-meta"></div>
+      <div class="modal-titulo" id="modal-titulo"></div>
+      <div class="modal-estilo" id="modal-estilo"></div>
+      <hr class="modal-divider" />
+      <div class="modal-tags" id="modal-tags"></div>
+      <div class="modal-desc" id="modal-desc"></div>
+      <button class="modal-save-btn" id="modal-save-btn">
+        <i data-lucide="heart"></i>
+        <span id="modal-save-label">Guardar en favoritos</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

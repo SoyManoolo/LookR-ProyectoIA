@@ -2,3 +2,8 @@ pydantic
 pydantic-ai-slim[openai]
 python-dotenv
 pinecone
+sentence-transformers
+Pillow
+fastapi
+uvicorn
+python-multipart

@@ -17,8 +17,7 @@ def crear_agente() -> Agent:
         or "http://localhost:11434/v1"
     )
 
-    # Cargamos el nombre del modelo desde las variables de entorno, con gemma4:e4b como valor por defecto
-    model_name = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
+    model_name = os.getenv("OLLAMA_MODEL", "gemma3:12b")
     # Cargamos algunos ejemplos del JSON de entrenamiento para que el agente siga un estilo consistente
     contexto_ejemplos = cargar_ejemplos_entrenamiento()
 
