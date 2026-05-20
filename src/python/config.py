@@ -2,8 +2,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# Cargamos el archivo .env una sola vez al importar este módulo
-load_dotenv()
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+# Cargamos el archivo .env de la raíz del proyecto una sola vez al importar este módulo
+load_dotenv(PROJECT_ROOT / ".env")
+
+
+def project_path(path_value: str | Path) -> Path:
+    """Resuelve rutas relativas tomando como base la raíz del proyecto."""
+    path = Path(path_value)
+    return path if path.is_absolute() else PROJECT_ROOT / path
 
 class Settings:
     # Ollama
@@ -17,12 +25,12 @@ class Settings:
 
     # Pinecone
     PINECONE_APIKEY = os.getenv("PINECONE_APIKEY")
-    PINECONE_INDEX_NAME = "buscador"
-    PINECONE_REGION = "us-east-1"
+    PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "buscador")
+    PINECONE_REGION = os.getenv("PINECONE_REGION", "us-east-1")
+    PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "mi-espacio")
 
     # Datos
-    # Corregido a .jsonl basándome en tu estructura de carpetas
-    TRAINING_EXAMPLES_PATH = Path(os.getenv("TRAINING_EXAMPLES_PATH", "data/examples/training_examples.json"))
+    TRAINING_EXAMPLES_PATH = project_path(os.getenv("TRAINING_EXAMPLES_PATH", "data/examples/training_examples.json"))
 
 # Instancia única para usar en todo el proyecto
 settings = Settings()

@@ -5,10 +5,12 @@ import os
 # Añadimos el directorio padre al path para poder importar módulos de src/python
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from index import crear_index
+from config import settings
 
-# Obtenemos el índice de Pinecone al cargar este módulo
-dense_index = crear_index()
+try:
+    from .index import crear_index
+except ImportError:
+    from index import crear_index
 
 # Función para hacer búsquedas semánticas en el índice
 def search(query):
@@ -21,9 +23,10 @@ def search(query):
         Lista de tuplas con (id, score, nombre, descripción) de los resultados
     """
     # Ejecutamos la búsqueda en el índice usando el texto como query
+    dense_index = crear_index()
     results = dense_index.search(
         # Especificamos el namespace donde están nuestros registros
-        namespace="mi-espacio",
+        namespace=settings.PINECONE_NAMESPACE,
         # Solicitamos los 5 resultados más relevantes
         top_k=5,
         # Pasamos el texto de búsqueda que será embebido automáticamente
@@ -80,14 +83,18 @@ def main():
     # Parseamos los argumentos proporcionados
     args = parser.parse_args()
 
-    if args.imagen:
-        # Búsqueda por imagen: describimos la imagen y luego buscamos por el texto generado
-        print(f"Analizando imagen: {args.imagen}")
-        descripcion, resultados = search_by_image(args.imagen)
-        print(f"Descripción generada: {descripcion}\n")
-    else:
-        # Búsqueda por texto directa
-        resultados = search(args.texto)
+    try:
+        if args.imagen:
+            # Búsqueda por imagen: describimos la imagen y luego buscamos por el texto generado
+            print(f"Analizando imagen: {args.imagen}")
+            descripcion, resultados = search_by_image(args.imagen)
+            print(f"Descripción generada: {descripcion}\n")
+        else:
+            # Búsqueda por texto directa
+            resultados = search(args.texto)
+    except RuntimeError as exc:
+        print(f"Error de configuración: {exc}", file=sys.stderr)
+        sys.exit(1)
 
     # Mostramos cada resultado en pantalla
     for item in resultados:

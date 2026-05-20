@@ -26,9 +26,12 @@ public class ImageDescriptionAgent {
     }
 
     public String describeImage(Path imagePath, Duration timeout) throws IOException, InterruptedException {
+        String scriptPath = projectDir.resolve("main.py").toFile().isFile()
+                ? "main.py"
+                : "src/python/main.py";
         ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList(
                 pythonCommand,
-                "main.py",
+                scriptPath,
                 imagePath.toString()
         ));
         processBuilder.directory(projectDir.toFile());

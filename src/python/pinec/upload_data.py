@@ -1,8 +1,10 @@
 import json
-from index import crear_index
+from pathlib import Path
 
-# Obtenemos el índice de Pinecone al cargar este módulo
-dense_index = crear_index()
+try:
+    from .index import crear_index
+except ImportError:
+    from index import crear_index
 
 # Función para subir datos de prendas al índice
 def subir_datos(path, ns):
@@ -12,8 +14,10 @@ def subir_datos(path, ns):
         path: Ruta del archivo JSON con los registros de prendas
         ns: Namespace (espacio de nombres) donde se guardarán los registros
     """
+    dense_index = crear_index()
+
     # Abrimos el archivo JSON en modo lectura con codificación UTF-8
-    with open(path, "r", encoding="utf-8") as f:
+    with Path(path).open("r", encoding="utf-8") as f:
         # Parseamos el JSON y cargamos todos los registros en memoria
         ejemplos = json.load(f)
 

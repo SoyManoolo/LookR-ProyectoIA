@@ -4,6 +4,7 @@ from pathlib import Path
 from pydantic_ai import Agent, BinaryContent
 
 from categories import DescripcionRopa
+from config import project_path
 
 
 # Función para detectar el tipo de archivo de la imagen (mimetype)
@@ -26,9 +27,12 @@ def describir_imagen_bytes(agent: Agent, image_bytes: bytes, media_type: str = "
 def describir_imagen(agent: Agent, image_path: str | Path) -> DescripcionRopa:
     """Lee una imagen desde una ruta de archivo y obtiene su descripción estructurada."""
     # Convertimos la ruta a un objeto Path para trabajar de forma más segura
-    path = Path(image_path)
+    original_path = Path(image_path)
+    path = original_path if original_path.is_absolute() else project_path(original_path)
     # Si el archivo no existe y está en la carpeta data, lo buscamos dentro de data/images
-    if not path.exists() and path.parent == Path("data"):
-        path = Path("data/images") / path.name
+    if not path.exists() and original_path.parent == Path("data"):
+        path = project_path(Path("data/images") / path.name)
+    if not path.exists():
+        raise FileNotFoundError(f"No se ha encontrado la imagen: {path}")
     # Leemos los bytes del archivo y detectamos el tipo MIME, luego los pasamos al agente
     return describir_imagen_bytes(agent, path.read_bytes(), detectar_media_type(path))
