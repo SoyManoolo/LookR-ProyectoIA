@@ -4,28 +4,28 @@ from config import settings
 
 # Función para cargar unos ejemplos de descripción para que el agente tenga algunos ejemplos, ya que no se hace fine tuning
 def cargar_ejemplos_entrenamiento(path: str | Path | None = None, limite: int = 3) -> str:
-    """Carga pocos ejemplos JSONL para guiar al modelo sin fine tuning completo."""
+    """Carga pocos ejemplos JSON o JSONL para guiar al modelo sin fine tuning completo."""
     # Obtenemos la ruta del archivo de ejemplos desde variable de entorno o usamos la ruta por defecto
-    examples_path = settings.TRAINING_EXAMPLES_PATH
+    examples_path = Path(path) if path is not None else settings.TRAINING_EXAMPLES_PATH
     # En caso de que el path no exista devolvemos un string vacio
     if not examples_path.exists():
         return ""
 
+    contenido = examples_path.read_text(encoding="utf-8").strip()
+    if not contenido:
+        return ""
+
+    datos = json.loads(contenido) if contenido.startswith("[") else [
+        json.loads(line) for line in contenido.splitlines() if line.strip()
+    ]
+
     # Si el path existe vamos guardando los ejemplos del json en la lista
     ejemplos: list[str] = []
-    for line in examples_path.read_text(encoding="utf-8").splitlines():
-        # Saltamos líneas vacías
-        if not line.strip():
-            continue
-        # Parseamos cada línea como JSON
-        data = json.loads(line)
+    for data in datos[:limite]:
         # Extraemos el campo 'output' si existe, si no usamos el JSON completo
         output = data.get("output", data)
         # Añadimos el ejemplo formateado como JSON a la lista
         ejemplos.append(json.dumps(output, ensure_ascii=False))
-        # Paramos cuando alcanzamos el límite de ejemplos
-        if len(ejemplos) >= limite:
-            break
 
     # Si la lista queda vacia se le pasa un string vacio
     if not ejemplos:

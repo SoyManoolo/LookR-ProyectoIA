@@ -17,7 +17,7 @@ def main() -> None:
     # Configuramos el parser de argumentos de línea de comandos
     parser = argparse.ArgumentParser(description="Describe una imagen de ropa y devuelve JSON.")
     # Añadimos el argumento posicional 'image' con valor por defecto
-    parser.add_argument("image", nargs="?", default="data/images/unnamed.png", help="Ruta de la imagen")
+    parser.add_argument("image", nargs="?", default="data/images/eleganza-beige-satin-gown.png", help="Ruta de la imagen")
     # Parseamos los argumentos pasados al script
     args = parser.parse_args()
 
