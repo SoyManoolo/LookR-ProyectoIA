@@ -1,105 +1,95 @@
 import argparse
-import sys
+import json
+import logging
 import os
+import urllib.request
+from pathlib import Path
 
-# Añadimos el directorio padre al path para poder importar módulos de src/python
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+logger = logging.getLogger(__name__)
 
-from config import settings
-
+# Intentamos importaciones relativas o absolutas
 try:
-    from .index import crear_index
+    from .index import crear_index, crear_index_semantico
+    from .embeddings import embed_texto, embed_imagen, embed_descripcion, embed_combinado
 except ImportError:
-    from index import crear_index
+    from index import crear_index, crear_index_semantico
+    from embeddings import embed_texto, embed_imagen, embed_descripcion, embed_combinado
 
-# Función para hacer búsquedas semánticas en el índice
-def search(query):
-    """Busca registros en Pinecone usando búsqueda semántica por texto.
-    
-    Args:
-        query: Texto de búsqueda (p.ej. 'rojo', 'camisa elegante')
-        
-    Returns:
-        Lista de tuplas con (id, score, nombre, descripción) de los resultados
-    """
-    # Ejecutamos la búsqueda en el índice usando el texto como query
-    dense_index = crear_index()
-    results = dense_index.search(
-        # Especificamos el namespace donde están nuestros registros
-        namespace=settings.PINECONE_NAMESPACE,
-        # Solicitamos los 5 resultados más relevantes
-        top_k=5,
-        # Pasamos el texto de búsqueda que será embebido automáticamente
-        inputs={"text": query}
-    )
+# Inicialización de índices
+dense_index = crear_index()
+semantic_index = crear_index_semantico()
+_NAMESPACE = "mi-espacio"
 
-    # Procesamos los resultados para extraer información útil
-    formateados = []
-    # Iteramos sobre cada resultado (hit) encontrado
-    for hit in results['result']['hits']:
-        # Extraemos el nombre de la prenda (N/A si no existe el campo)
-        nombre = hit['fields'].get('nombre', 'N/A')
-        # Extraemos la descripción de la prenda (N/A si no existe el campo)
-        desc = hit['fields'].get('descripcion', 'N/A')
-        # Creamos una tupla con información relevante: id, score de similitud, nombre, descripción
-        formateados.append((hit['id'], hit['score'], nombre, desc))
-    # Retornamos la lista formateada de resultados
-    return formateados
+# Pesos de la búsqueda híbrida
+_W_VISUAL = 0.20
+_W_SEMANTIC = 0.50
+_W_KEYWORD = 0.30
 
+_translate_cache: dict[str, str] = {}
+_expand_cache: dict[str, str] = {}
 
-def search_by_image(image_path):
-    """Busca prendas similares a partir de una imagen.
-    
-    Describe la imagen usando el agente de IA y luego busca en Pinecone
-    usando la descripción generada como query de texto.
-    
-    Args:
-        image_path: Ruta de la imagen a analizar
-        
-    Returns:
-        Tupla con (descripcion_generada, lista de resultados)
-    """
-    from agent import crear_agente
-    from image_utils import describir_imagen
+def _get_ollama_url() -> str:
+    return (os.getenv("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/v1").rstrip("/")
 
-    # Creamos el agente y obtenemos la descripción de la imagen
-    agent = crear_agente()
-    datos = describir_imagen(agent, image_path)
-
-    # Usamos la descripción generada como query de texto para buscar en Pinecone
-    resultados = search(datos.descripcion)
-    return datos.descripcion, resultados
-
-
-# Función principal para ejecutar búsquedas desde línea de comandos
-def main():
-    """Interfaz de línea de comandos para hacer búsquedas en Pinecone por texto o imagen."""
-    # Creamos el parser de argumentos de línea de comandos
-    parser = argparse.ArgumentParser(description="Búsqueda semántica en Pinecone por texto o imagen.")
-    # Grupo mutuamente excluyente: texto O imagen
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("--texto", "-t", help="Texto de búsqueda (p.ej. 'camisa elegante roja')")
-    group.add_argument("--imagen", "-i", help="Ruta de la imagen a buscar (p.ej. 'data/images/foto.jpg')")
-    # Parseamos los argumentos proporcionados
-    args = parser.parse_args()
-
+def _llamar_ollama(prompt: str, timeout: int = 10) -> str | None:
+    """Llama a Ollama usando urllib para evitar dependencias extra."""
+    model = os.getenv("OLLAMA_MODEL", "gemma3:12b")
+    payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode()
     try:
-        if args.imagen:
-            # Búsqueda por imagen: describimos la imagen y luego buscamos por el texto generado
-            print(f"Analizando imagen: {args.imagen}")
-            descripcion, resultados = search_by_image(args.imagen)
-            print(f"Descripción generada: {descripcion}\n")
-        else:
-            # Búsqueda por texto directa
-            resultados = search(args.texto)
-    except RuntimeError as exc:
-        print(f"Error de configuración: {exc}", file=sys.stderr)
-        sys.exit(1)
+        req = urllib.request.Request(f"{_get_ollama_url()}/api/generate", data=payload, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout) as resp:
+            return json.loads(resp.read())["response"].strip()
+    except Exception as e:
+        logger.warning(f"Ollama no disponible: {e}")
+        return None
 
-    # Mostramos cada resultado en pantalla
-    for item in resultados:
-        print(item)
+def _keyword_score(query: str, meta: dict) -> float:
+    """Calcula coincidencia de palabras clave exactas."""
+    import unicodedata
+    def normalizar(t: str):
+        return set(unicodedata.normalize("NFKD", t.lower()).encode("ascii", "ignore").decode().split())
+    q_words = normalizar(query)
+    i_words = normalizar(meta.get("descripcion", "")) | normalizar(" ".join(meta.get("categoria", [])))
+    return len(q_words & i_words) / max(len(q_words), 1)
 
-# Condición para ejecutar solo cuando el script se lanza directamente
+def _query_pinecone(index, vector, top_k: int) -> dict:
+    return index.query(namespace=_NAMESPACE, vector=vector, top_k=top_k, include_metadata=True)
+
+def search(query: str, por_imagen: bool = False, top_k: int = 6) -> list[tuple]:
+    """Búsqueda híbrida real (Visual + Semántica + Keywords)."""
+    if por_imagen:
+        results = _query_pinecone(dense_index, embed_imagen(query), top_k)
+        return _formatear_resultados(results["matches"])
+
+    # Intentamos traducir/expandir con Ollama para mejorar CLIP (que es inglés)
+    query_en = _llamar_ollama(f"Translate to English fashion terms: {query}") or query
+
+    # Obtenemos resultados de ambos índices
+    v_res = _query_pinecone(dense_index, embed_texto(query_en), top_k * 2)
+    s_res = _query_pinecone(semantic_index, embed_descripcion(query), top_k * 2)
+
+    # Fusionar y puntuar (RRF o suma ponderada)
+    scores = {}
+    for m in v_res["matches"]:
+        scores[m["id"]] = {"meta": m["metadata"], "v": m["score"], "s": 0.0}
+    for m in s_res["matches"]:
+        if m["id"] in scores: scores[m["id"]]["s"] = m["score"]
+        else: scores[m["id"]] = {"meta": m["metadata"], "v": 0.0, "s": m["score"]}
+
+    ranked = sorted(scores.items(), key=lambda x: (_W_VISUAL*x[1]["v"] + _W_SEMANTIC*x[1]["s"] + _W_KEYWORD*_keyword_score(query, x[1]["meta"])), reverse=True)[:top_k]
+    
+    return [(rid, round(_W_VISUAL*v["v"] + _W_SEMANTIC*v["s"], 4), v["meta"].get("nombre", "N/A"), v["meta"].get("descripcion", "N/A"), v["meta"].get("imagen", ""), v["meta"].get("categoria", []), v["meta"].get("estilo", "")) for rid, v in ranked]
+
+def _formatear_resultados(matches):
+    return [(m["id"], m["score"], m["metadata"].get("nombre", "N/A"), m["metadata"].get("descripcion", "N/A"), m["metadata"].get("imagen", ""), m["metadata"].get("categoria", []), m["metadata"].get("estilo", "")) for m in matches]
+
+def search_combinado(imagen_path: str, texto: str, top_k: int = 6, alpha: float = 0.7) -> list[tuple]:
+    vector = embed_combinado(imagen_path, texto, alpha=alpha)
+    results = _query_pinecone(dense_index, vector, top_k)
+    return _formatear_resultados(results["matches"])
+
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("query")
+    args = parser.parse_args()
+    for res in search(args.query): print(res)

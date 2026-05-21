@@ -1,44 +1,37 @@
+from pinecone import Pinecone, ServerlessSpec
 from config import settings
 
-# Función para crear o acceder al índice de Pinecone
-def crear_index():
-    """Crea un nuevo índice en Pinecone o retorna uno existente para búsquedas vectoriales."""
+def _get_pc():
+    """Obtiene el cliente de Pinecone usando la configuración centralizada."""
     if not settings.PINECONE_APIKEY:
-        raise RuntimeError("Falta PINECONE_APIKEY en el archivo .env o en las variables de entorno.")
+        raise RuntimeError("Falta PINECONE_APIKEY en la configuración.")
+    return Pinecone(api_key=settings.PINECONE_APIKEY)
 
-    try:
-        from pinecone import Pinecone
-    except Exception as exc:
-        raise RuntimeError(
-            "No se puede cargar Pinecone. Instala el paquete actual con "
-            "`pip uninstall pinecone-client` y `pip install pinecone`."
-        ) from exc
-
-    # Instanciamos el cliente de Pinecone con la API key
-    pc = Pinecone(api_key=settings.PINECONE_APIKEY)
-
-    # Definimos el nombre del índice que usaremos
-    index_name = settings.PINECONE_INDEX_NAME
-
-    # Comprobamos si el índice ya existe, si no lo creamos
+def crear_index():
+    """Crea o accede al índice multimodal de Pinecone (vectores CLIP 512d)."""
+    pc = _get_pc()
+    # Usamos el nombre base de config.py para mantener la consistencia
+    index_name = f"{settings.PINECONE_INDEX_NAME}-multimodal"
+    
     if not pc.has_index(index_name):
-        # Creamos un nuevo índice con embeddings automáticos usando el modelo llama-text-embed-v2
-        pc.create_index_for_model(
-            name=index_name,
-            # Configuración de cloud: AWS en región us-east-1
-            cloud="aws",
-            region=settings.PINECONE_REGION,
-            # Configuración de embeddings: modelo y mapeo de campos
-            embed={
-                # Modelo de embedding que generará automáticamente los vectores
-                "model": "llama-text-embed-v2",
-                # Mapeamos el campo 'descripcion' para que sea embebido
-                "field_map": {"text": "descripcion"}
-            }
+        pc.create_index(
+            name=index_name, 
+            dimension=512,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region=settings.PINECONE_REGION),
         )
+    return pc.Index(index_name)
 
-    # Obtenemos una referencia al índice (nuevo o existente) para operaciones futuras
-    dense_index = pc.Index(index_name)
-
-    # Retornamos el objeto índice para usarlo en otras funciones
-    return dense_index
+def crear_index_semantico():
+    """Crea o accede al índice semántico de Pinecone (768d, multilingual)."""
+    pc = _get_pc()
+    index_name = f"{settings.PINECONE_INDEX_NAME}-semantico"
+    
+    if not pc.has_index(index_name):
+        pc.create_index(
+            name=index_name, 
+            dimension=768,
+            metric="cosine",
+            spec=ServerlessSpec(cloud="aws", region=settings.PINECONE_REGION),
+        )
+    return pc.Index(index_name)

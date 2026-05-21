@@ -1,3 +1,8 @@
 /venv
+.venv
 .env
 __pycache__/
+data/fotos_kaggle/
+data/armarios/
+data/images
+*.upload_log.json

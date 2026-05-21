@@ -17,7 +17,7 @@ class Settings:
     # Ollama
     OLLAMA_URL = (
         os.getenv("OLLAMA_BASE_URL") 
-        or os.getenv("OLLAMA_URL")   # Añadido por consistencia con tu .env
+        or os.getenv("OLLAMA_URL") 
         or os.getenv("OLLAMA_LOCAL") 
         or "http://localhost:11434/v1"
     )
