@@ -13,4 +13,4 @@ COPY . .
 EXPOSE 8080
 
 # Comando de inicio
-CMD ["python", "-m", "uvicorn", "src.python.api:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["python", "-m", "uvicorn", "src.python.api:app", "--host", "0.0.0.0", "--port", "${PORT:-8080}"]
