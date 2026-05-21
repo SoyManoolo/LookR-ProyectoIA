@@ -24,7 +24,7 @@ class Settings:
     OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma4:e4b")
 
     # Pinecone
-    PINECONE_APIKEY = os.getenv("PINECONE_APIKEY")
+    PINECONE_APIKEY = os.getenv("PINECONE_APIKEY") or os.getenv("PINECONE_API_KEY")
     PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX_NAME", "buscador")
     PINECONE_REGION = os.getenv("PINECONE_REGION", "us-east-1")
     PINECONE_NAMESPACE = os.getenv("PINECONE_NAMESPACE", "mi-espacio")

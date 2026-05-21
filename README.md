@@ -98,11 +98,13 @@ ProyectoIA/
 ### Configuración (`.env`)
 ```env
 OLLAMA_BASE_URL=http://localhost:11434/v1
-OLLAMA_MODEL=gemma3:12b
+OLLAMA_MODEL=gemma4:e4b
 PINECONE_APIKEY=tu_api_key
 PINECONE_INDEX_NAME=buscador
 PINECONE_REGION=us-east-1
+PINECONE_NAMESPACE=mi-espacio
 TRAINING_EXAMPLES_PATH=data/examples/training_examples.json
+```
 
 `OLLAMA_KEEP_ALIVE` controla cuánto tiempo Ollama retiene el modelo en VRAM tras la última llamada. Usar `0` para liberar VRAM inmediatamente; `5m` es el valor recomendado para uso interactivo.
 

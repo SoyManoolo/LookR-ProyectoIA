@@ -4,7 +4,7 @@ from config import settings
 def _get_pc():
     """Obtiene el cliente de Pinecone usando la configuración centralizada."""
     if not settings.PINECONE_APIKEY:
-        raise RuntimeError("Falta PINECONE_APIKEY en la configuración.")
+        raise RuntimeError("Falta PINECONE_APIKEY o PINECONE_API_KEY en la configuración.")
     return Pinecone(api_key=settings.PINECONE_APIKEY)
 
 def crear_index():
