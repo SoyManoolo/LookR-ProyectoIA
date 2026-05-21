@@ -4,9 +4,9 @@ from fastapi import File, Form, APIRouter
 import os
 import tempfile
 
-from utils import _formatear, _validar_top_k
+from .utils import _formatear, _validar_top_k
 from pinec.search import search, search_combinado
-from models import RespuestaRecomendaciones
+from .models import RespuestaRecomendaciones
 
 router = APIRouter()
 

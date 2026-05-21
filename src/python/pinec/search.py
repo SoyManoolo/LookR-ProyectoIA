@@ -5,6 +5,8 @@ import os
 import urllib.request
 from pathlib import Path
 
+from config import settings
+
 logger = logging.getLogger(__name__)
 
 # Intentamos importaciones relativas o absolutas
@@ -29,11 +31,11 @@ _translate_cache: dict[str, str] = {}
 _expand_cache: dict[str, str] = {}
 
 def _get_ollama_url() -> str:
-    return (os.getenv("OLLAMA_BASE_URL") or "http://localhost:11434").rstrip("/v1").rstrip("/")
+    return settings.OLLAMA_URL.rstrip("/v1").rstrip("/")
 
 def _llamar_ollama(prompt: str, timeout: int = 10) -> str | None:
     """Llama a Ollama usando urllib para evitar dependencias extra."""
-    model = os.getenv("OLLAMA_MODEL", "gemma3:12b")
+    model = settings.OLLAMA_MODEL
     payload = json.dumps({"model": model, "prompt": prompt, "stream": False}).encode()
     try:
         req = urllib.request.Request(f"{_get_ollama_url()}/api/generate", data=payload, headers={"Content-Type": "application/json"})

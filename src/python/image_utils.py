@@ -1,12 +1,31 @@
 import json
 import mimetypes
 import re
+import unicodedata
 
 from pathlib import Path
 from pydantic_ai import Agent, BinaryContent
 
-from categories import DescripcionRopa
+from categories import DescripcionRopa, categorias_permitidas
 from config import project_path
+
+
+_CATEGORIA_ALIASES = {
+    "zapato": "zapatos",
+    "botas": "bota",
+    "sandalias": "sandalia",
+    "zapatillas": "deportivas",
+    "deportiva": "deportivas",
+    "pantalones": "pantalón",
+    "pantalon": "pantalón",
+    "joyeria": "joyería",
+}
+
+
+def _normalizar_categoria(categoria: str) -> str:
+    normalizada = categoria.strip().lower()
+    sin_acentos = unicodedata.normalize("NFKD", normalizada).encode("ascii", "ignore").decode()
+    return _CATEGORIA_ALIASES.get(sin_acentos, _CATEGORIA_ALIASES.get(normalizada, normalizada))
 
 
 # Función para detectar el tipo de archivo de la imagen (mimetype)
@@ -28,6 +47,11 @@ async def describir_imagen_bytes(agent: Agent, image_bytes: bytes, media_type: s
     data = json.loads(texto)
     if isinstance(data.get("categoria"), str):
         data["categoria"] = [data["categoria"]]
+    data["categoria"] = [
+        categoria
+        for categoria in (_normalizar_categoria(c) for c in data.get("categoria", []))
+        if categoria in categorias_permitidas
+    ] or ["otro"]
     return DescripcionRopa.model_validate(data)
 
 # Función principal que recibe una ruta de imagen, lee sus bytes y llama al análisis del agente

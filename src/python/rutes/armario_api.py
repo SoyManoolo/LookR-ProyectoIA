@@ -3,11 +3,11 @@ from fastapi import File, HTTPException, UploadFile, APIRouter, Depends
 from pathlib import Path
 import mimetypes
 
-from models import RespuestaArmario, ItemArmario, RespuestaRecomendaciones
+from .models import RespuestaArmario, ItemArmario, RespuestaRecomendaciones
 from image_utils import describir_imagen_bytes
 import armario as armario_mod
-from utils import _formatear
-from dependencies import get_agent
+from .utils import _formatear
+from .dependencies import get_agent
 
 router = APIRouter()
 

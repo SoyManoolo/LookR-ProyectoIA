@@ -44,10 +44,10 @@ app.add_middleware(
 
 # Registro de Rutas (Routers)
 # Aquí conectamos los archivos de la carpeta /rutes
-app.include_router(recomendar_api.router, prefix="/recomendar", tags=["Recomendaciones"])
+app.include_router(recomendar_api.router, tags=["Recomendaciones"])
 app.include_router(analizar_api.router, tags=["Análisis"])
 app.include_router(descubrir_api.router, tags=["Descubrir"])
-app.include_router(armario_api.router, prefix="/armario", tags=["Armario"])
+app.include_router(armario_api.router, tags=["Armario"])
 app.include_router(imagen_api.router, tags=["Imágenes"])
 
 # Archivos estáticos y ruta base

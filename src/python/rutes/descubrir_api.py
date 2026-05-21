@@ -1,11 +1,11 @@
 import mimetypes
-from models import ResultadoDescubrir
-from utils import _formatear, _validar_top_k
+from .models import ResultadoDescubrir
+from .utils import _formatear, _validar_top_k
 from fastapi import HTTPException, UploadFile, File, Form, APIRouter, Depends
 from image_utils import describir_imagen_bytes
 
 from pinec.search import search
-from dependencies import get_agent
+from .dependencies import get_agent
 
 router = APIRouter()
 

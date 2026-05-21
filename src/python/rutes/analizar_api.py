@@ -4,9 +4,9 @@ from image_utils import describir_imagen_bytes
 from pathlib import Path
 import os
 
-from models import ResultadoAnalisis
+from .models import ResultadoAnalisis
 from pinec.upload_data import subir_prenda
-from utils import _slugify, _IMAGES
+from .utils import _slugify, _IMAGES
 from .dependencies import get_agent 
 
 
@@ -42,5 +42,5 @@ async def analizar_imagen(imagen: UploadFile = File(...), agent = Depends(get_ag
         descripcion=datos.descripcion,
         categoria=datos.categoria,
         estilo=datos.estilo,
-        imagen_url=f"/imagen/{nombre_archivo}",
+        imagen_url=f"/imagen/images/{nombre_archivo}",
     )

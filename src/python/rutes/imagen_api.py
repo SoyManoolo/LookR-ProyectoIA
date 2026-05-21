@@ -1,6 +1,6 @@
 from fastapi.responses import FileResponse
 from fastapi import HTTPException, APIRouter
-from utils import _DATA
+from .utils import _DATA
 
 router = APIRouter()
 

@@ -1,9 +1,12 @@
-from models import RespuestaRecomendaciones, Recomendacion
+from .models import RespuestaRecomendaciones, Recomendacion
 from pathlib import Path
 import re
 
-_STATIC = Path(__file__).parent / "static"
-_DATA   = Path(__file__).parent.parent.parent / "data"
+_PYTHON_SRC = Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+
+_STATIC = _PYTHON_SRC / "static"
+_DATA   = _PROJECT_ROOT / "data"
 _IMAGES = _DATA / "images"
 
 def _formatear(resultados: list[tuple]) -> RespuestaRecomendaciones:
@@ -27,7 +30,7 @@ def _imagen_url(imagen_path: str) -> str | None:
         return None
     p = Path(imagen_path)
     if not p.is_absolute():
-        p = (Path(__file__).parent / p).resolve()
+        p = (_PROJECT_ROOT / p).resolve()
     try:
         rel = p.relative_to(_DATA)
         return f"/imagen/{rel}"
