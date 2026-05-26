@@ -69,9 +69,9 @@ ProyectoIA/
         ├── reindexar.py              # Script de reindexación masiva del catálogo
         ├── upload_batch.py           # Carga masiva de imágenes al catálogo
         ├── static/
-        │   ├── index.html            # Estructura HTML de la interfaz
-        │   ├── styles.css            # Estilos (variables, layout, cards, modal)
-        │   └── app.js                # Lógica de la interfaz (búsquedas, armario, modal)
+        │   ├── index.html            # HTML puro — 5 paneles + modal (sin CSS ni JS inline)
+        │   ├── styles.css            # Estilos completos: variables, layout, cards, skeleton, modal, armario, filtros
+        │   └── app.js                # Toda la lógica JS: búsquedas, wishlist, armario, modal, filtros por categoría
         └── pinec/
             ├── index.py              # Creación de índices Pinecone
             ├── embeddings.py         # Modelos CLIP y multilingual
@@ -131,6 +131,47 @@ python3 api.py
 ```
 
 La interfaz estará disponible en [http://localhost:8000](http://localhost:8000)
+
+---
+
+## Demo pública con Cloudflare Tunnel
+
+Para exponer el servidor localmente a través de una URL pública sin configuración de red, usa [cloudflared](https://github.com/cloudflare/cloudflared). No requiere cuenta.
+
+### Primera vez — descargar cloudflared
+
+```bash
+cd /ruta/a/ProyectoIA
+wget https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 -O cloudflared
+chmod +x cloudflared
+```
+
+### Cada vez que quieras levantar la demo
+
+Abre 3 terminales en orden:
+
+**Terminal 1 — verificar Ollama**
+```bash
+curl http://localhost:11434/api/tags
+# Si no responde:
+ollama serve
+```
+
+**Terminal 2 — FastAPI**
+```bash
+cd src/python
+source ../../venv/bin/activate
+python3 api.py
+# Espera: "Application startup complete."
+```
+
+**Terminal 3 — túnel**
+```bash
+./cloudflared tunnel --protocol http2 --url http://localhost:8000
+# Aparecerá: https://xxxx.trycloudflare.com  ← URL pública
+```
+
+La URL cambia cada vez que reinicias el túnel. Las 3 terminales deben permanecer abiertas mientras dure la demo.
 
 ---
 
@@ -276,3 +317,85 @@ Al arrancar la API por primera vez se descargan:
 - `paraphrase-multilingual-mpnet-base-v2` (~280 MB) — embeddings semánticos, cargado en CPU
 
 Los modelos se cachean en `~/.cache/huggingface/`.
+
+---
+
+## Cheatsheet de comandos
+
+Referencia rápida de los comandos más usados.
+
+### Entorno
+```bash
+# Activar entorno virtual (siempre primero)
+cd /ruta/a/ProyectoIA
+source venv/bin/activate
+```
+
+### Ollama
+```bash
+# Verificar si está corriendo
+curl http://localhost:11434/api/tags
+
+# Arrancar (si no está corriendo)
+ollama serve
+
+# Ver modelos descargados
+ollama list
+
+# Liberar VRAM
+kill $(pgrep ollama)
+```
+
+### Servidor FastAPI
+```bash
+# Arrancar
+cd src/python
+source ../../venv/bin/activate
+python3 api.py
+
+# Ver qué proceso ocupa el puerto 8000
+ss -tlnp | grep 8000
+
+# Liberar el puerto 8000
+kill $(lsof -t -i:8000)
+```
+
+### Demo pública
+```bash
+# Levantar túnel (desde la raíz del proyecto)
+./cloudflared tunnel --protocol http2 --url http://localhost:8000
+```
+
+### Subir fotos al catálogo
+```bash
+cd src/python
+source ../../venv/bin/activate
+
+# Subir todas las fotos de una carpeta
+python3 upload_batch.py --carpeta ../../data/fotos_kaggle
+
+# Subir con límite
+python3 upload_batch.py --carpeta ../../data/fotos_kaggle --limite 50
+
+# Reanudar una carga interrumpida
+python3 upload_batch.py --carpeta ../../data/fotos_kaggle --reanudar
+
+# Orden aleatorio para mayor variedad
+python3 upload_batch.py --carpeta ../../data/fotos_kaggle --limite 50 --reanudar --aleatorio
+```
+
+### Pinecone — mantenimiento
+```python
+# Desde src/python/ con el entorno activo: python3
+from pinec.index import crear_index, crear_index_semantico
+
+dense    = crear_index()
+semantic = crear_index_semantico()
+
+# Eliminar un vector por ID
+dense.delete(ids=["id-aqui"], namespace="mi-espacio")
+semantic.delete(ids=["id-aqui"], namespace="mi-espacio")
+
+# Eliminar por filtro de metadatos
+semantic.delete(filter={"categoria": {"$in": ["categoria-a-borrar"]}}, namespace="mi-espacio")
+```
