@@ -64,7 +64,9 @@ ProyectoIA/
         ├── armario.py                # Gestión del armario personal (JSON + Pinecone)
         ├── image_utils.py            # Análisis de imágenes con el agente
         ├── categories.py             # Categorías permitidas y modelo DescripcionRopa
+        ├── config.py                 # Configuración global del proyecto
         ├── examples.py               # Carga de ejemplos de estilo para el agente
+        ├── image_utils.py            # Funciones relacionadas con la información de la imagen
         ├── main.py                   # CLI para analizar imágenes desde terminal
         ├── reindexar.py              # Script de reindexación masiva del catálogo
         ├── upload_batch.py           # Carga masiva de imágenes al catálogo
