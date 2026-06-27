@@ -152,23 +152,20 @@ El `user_id` se genera automáticamente en el navegador (UUID en localStorage) s
 
 ---
 
-## Búsqueda híbrida
+## 🔍 Arquitectura de Búsqueda Híbrida
 
-Cada búsqueda por texto combina tres capas:
-
+Cada consulta realizada por el usuario pasa por un pipeline de procesamiento que combina tres capas lógicas para calcular el score de relevancia final:
+```mermaid
+graph TD
+    Query[Query de Usuario] --> Expansion[Ollama: Expansión Contextual]
+    Expansion --> Layer1[0.20 × Visual: CLIP Embeddings]
+    Expansion --> Layer2[0.50 × Semántico: Multilingual MPNet]
+    Query --> Layer3[0.30 × Keyword Boost: Metadatos]
+    Layer1 --> Score[Cálculo de Score Combinado]
+    Layer2 --> Score
+    Layer3 --> Score
+    Score --> Results[Resultados Ordenados por Relevancia]
 ```
-Score final = 0.20 × visual (CLIP) + 0.50 × semántico (multilingual) + 0.30 × keyword (metadatos)
-```
-
-- **Visual**: CLIP traduce la query a inglés y busca por similitud de embedding de imagen
-- **Semántico**: modelo multilingüe entiende el español directamente sin traducción
-- **Keyword**: boost cuando la query coincide con descripción, categorías o estilo
-- **Contextual**: queries como "outfit para una boda" se expanden con Ollama antes de embedear
-
-La búsqueda **combinada** (imagen + texto) mezcla los vectores con un parámetro `alpha` (por defecto `0.7` = 70% imagen, 30% texto).
-
----
-
 ## Armario personal — almacenamiento
 
 Cada usuario tiene un espacio privado identificado por un UUID generado en el navegador:
