@@ -48,8 +48,8 @@ Lookr es un sistema de búsqueda y recomendación de prendas que combina visión
 ProyectoIA/
 ├── README.md
 ├── requirements.txt
+├── .env                              # Variables de entorno
 ├── data/
-│   ├── .env                          # Variables de entorno (no incluir en git)
 │   ├── images/                       # Imágenes del catálogo
 │   │   └── armario/                  # Imágenes del armario personal
 │   ├── armarios/                     # Metadatos JSON por usuario ({user_id}.json)
